@@ -1,31 +1,53 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { setToken, setUser } from "../reducers/userReducer";
+import { useDispatch } from "react-redux";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
+  // Déclaration des états pour l'email et le mot de passe
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const dispatch = useDispatch(); // Initialisation du dispatch pour utiliser les actions Redux
+  const navigate = useNavigate(); // Initialisation de navigate pour rediriger l'utilisateur
+
+  // Fonction de gestion de la soumission du formulaire
+  const handleSubmit = async (event) => {
+    event.preventDefault(); // Empêche le comportement par défaut du formulaire
 
     try {
+      // Envoi de la requête de connexion au backend
       const response = await axios.post(
         "http://localhost:3001/api/v1/user/login",
         {
-          email: username,
-          password: password,
+          email,
+          password,
         }
       );
-      console.log(response);
-      if (response.data && response.data.body.token) {
-        localStorage.setItem("token", response.data.body.token);
-        navigate("/profil");
-      }
+      // Récupération du token de la réponse
+      const { token } = response.data.body;
+
+      // Dispatch de l'action pour sauvegarder le token dans le store Redux
+      dispatch(setToken(token));
+
+      // Requête pour obtenir le profil de l'utilisateur avec le token
+      const profileResponse = await axios.get(
+        "http://localhost:3001/api/v1/user/profile",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      // Dispatch de l'action pour sauvegarder les informations de l'utilisateur dans le store Redux
+      dispatch(setUser(profileResponse.data.body));
+
+      // Redirection vers la page de profil
+      navigate("/profil");
     } catch (error) {
+      // Gestion des erreurs
       console.error("Login error:", error);
-      alert("Invalid credentials");
     }
   };
 
@@ -38,19 +60,19 @@ const Login = () => {
           <div className="input-wrapper">
             <label htmlFor="username">Username</label>
             <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
           <div className="input-wrapper">
             <label htmlFor="password">Password</label>
             <input
               type="password"
-              id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
           <div className="input-remember">

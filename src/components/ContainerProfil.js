@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
+import { setUser } from "../reducers/userReducer";
 
-const Container_profil = (props) => {
-  const [user, setUser] = useState(null);
-  
+const Container_profil = () => {
+  // Sélection de l'utilisateur et du token dans le store Redux
+  const user = useSelector((state) => state.user.user);
+  const token = useSelector((state) => state.user.token);
+  const dispatch = useDispatch(); // Initialisation du dispatch pour utiliser les actions Redux
 
+  // États locaux pour gérer l'édition du profil
+  const [isEditing, setIsEditing] = useState(false);
+  const [firstName, setFirstName] = useState(user ? user.firstName : "");
+  const [lastName, setLastName] = useState(user ? user.lastName : "");
+
+  // useEffect pour récupérer le profil de l'utilisateur si le token est présent
   useEffect(() => {
-    const token = localStorage.getItem("token");
     if (token) {
       axios
         .get("http://localhost:3001/api/v1/user/profile", {
@@ -15,18 +24,47 @@ const Container_profil = (props) => {
           },
         })
         .then((response) => {
-          setUser(response.data.body);
+          // Met à jour l'utilisateur dans le store Redux et les états locaux
+          dispatch(setUser(response.data.body));
+          setFirstName(response.data.body.firstName);
+          setLastName(response.data.body.lastName);
         })
         .catch((error) => {
+          // Gestion des erreurs
           console.error("Error fetching user profile", error);
-          //localStorage.removeItem("token");
-          console.log(error);
-          // handle redirection or error state
         });
-    } else {
-      // handle redirection or error state
     }
-  }, []);
+  }, [token, dispatch]);
+
+  // Fonction pour sauvegarder les modifications du profil
+  const handleSave = () => {
+    axios
+      .put(
+        "http://localhost:3001/api/v1/user/profile",
+        { firstName, lastName },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((response) => {
+        // Met à jour l'utilisateur dans le store Redux et désactive le mode édition
+        dispatch(setUser(response.data.body));
+        setIsEditing(false);
+      })
+      .catch((error) => {
+        // Gestion des erreurs
+        console.error("Error updating user profile", error);
+      });
+  };
+
+  // Fonction pour annuler les modifications du profil
+  const handleCancel = () => {
+    setFirstName(user.firstName);
+    setLastName(user.lastName);
+    setIsEditing(false);
+  };
 
   return (
     <main className="main bg-dark">
@@ -34,9 +72,37 @@ const Container_profil = (props) => {
         <h1>
           Welcome back
           <br />
-          {user ? `${user.firstName} ${user.lastName}` : 'User'}!
+          {isEditing ? (
+            <>
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+              <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </>
+          ) : (
+            `${user ? `${user.firstName} ${user.lastName}` : "User"}!`
+          )}
         </h1>
-        <button className="edit-button">Edit Name</button>
+        {isEditing ? (
+          <>
+            <button className="edit-button" onClick={handleSave}>
+              Save
+            </button>
+            <button className="edit-button" onClick={handleCancel}>
+              Cancel
+            </button>
+          </>
+        ) : (
+          <button className="edit-button" onClick={() => setIsEditing(true)}>
+            Edit Name
+          </button>
+        )}
       </div>
       <h2 className="sr-only">Accounts</h2>
       <section className="account">

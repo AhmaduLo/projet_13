@@ -1,13 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
+import { setUser, clearUser } from "../reducers/userReducer";
 
 const HeaderAfterLogin = () => {
-  const [user, setUser] = useState(null);
-  const navigate = useNavigate();
-  //--------afficher le nom---------
+  // Sélection de l'utilisateur et du token dans le store Redux
+  const user = useSelector((state) => state.user.user);
+  const token = useSelector((state) => state.user.token);
+  const navigate = useNavigate(); // Initialisation de navigate pour rediriger l'utilisateur
+  const dispatch = useDispatch(); // Initialisation du dispatch pour utiliser les actions Redux
+
+  // useEffect pour récupérer le profil de l'utilisateur si le token est présent
   useEffect(() => {
-    const token = localStorage.getItem("token");
     if (token) {
       axios
         .get("http://localhost:3001/api/v1/user/profile", {
@@ -16,21 +21,24 @@ const HeaderAfterLogin = () => {
           },
         })
         .then((response) => {
-          setUser(response.data.body);
+          // Met à jour l'utilisateur dans le store Redux
+          dispatch(setUser(response.data.body));
         })
         .catch((error) => {
+          // Gestion des erreurs et redirection vers la page d'accueil
           console.error("Error fetching user profile", error);
-          localStorage.removeItem("token");
+          dispatch(clearUser());
           navigate("/");
         });
     } else {
-      navigate("/");
+      navigate("/"); // Redirection vers la page d'accueil si le token est absent
     }
-  }, [navigate]);
-  //-----deconnection------
+  }, [token, navigate, dispatch]);
+
+  // Fonction de déconnexion
   const handleSignOut = () => {
-    localStorage.removeItem("token");
-    navigate("/");
+    dispatch(clearUser()); // Efface l'utilisateur et le token dans le store Redux
+    navigate("/"); // Redirection vers la page d'accueil
   };
 
   return (
