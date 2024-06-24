@@ -20,7 +20,7 @@ const Login = () => {
       );
       console.log(response);
       if (response.data && response.data.body.token) {
-        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("token", response.data.body.token);
         navigate("/profil");
       }
     } catch (error) {

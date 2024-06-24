@@ -1,13 +1,40 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const Container_profil = (props) => {
+  const [user, setUser] = useState(null);
+  
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios
+        .get("http://localhost:3001/api/v1/user/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          setUser(response.data.body);
+        })
+        .catch((error) => {
+          console.error("Error fetching user profile", error);
+          //localStorage.removeItem("token");
+          console.log(error);
+          // handle redirection or error state
+        });
+    } else {
+      // handle redirection or error state
+    }
+  }, []);
+
   return (
     <main className="main bg-dark">
       <div className="header">
         <h1>
           Welcome back
           <br />
-          Tony Jarvis!
+          {user ? `${user.firstName} ${user.lastName}` : 'User'}!
         </h1>
         <button className="edit-button">Edit Name</button>
       </div>
