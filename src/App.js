@@ -3,6 +3,7 @@ import React from "react";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
+import TransactionPage from "./pages/TransactionPage";
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/profil" element={<ProfilePage/>} />
+        <Route path="/transactions/:accountId" element={<TransactionPage/>} />
       </Routes>
     </BrowserRouter>
   );

@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { setUser } from "../reducers/userReducer";
+import { useNavigate } from "react-router-dom";
 
 const Container_profil = () => {
   // Sélection de l'utilisateur et du token dans le store Redux
   const user = useSelector((state) => state.user.user);
   const token = useSelector((state) => state.user.token);
   const dispatch = useDispatch(); // Initialisation du dispatch pour utiliser les actions Redux
+  const navigate = useNavigate();
 
   // États locaux pour gérer l'édition du profil
   const [isEditing, setIsEditing] = useState(false);
@@ -112,7 +114,12 @@ const Container_profil = () => {
           <p className="account-amount-description">Available Balance</p>
         </div>
         <div className="account-content-wrapper cta">
-          <button className="transaction-button">View transactions</button>
+          <button
+            className="transaction-button"
+            onClick={() => navigate("/transactions/8349")}
+          >
+            View transactions
+          </button>
         </div>
       </section>
       <section className="account">
