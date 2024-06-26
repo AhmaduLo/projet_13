@@ -15,7 +15,7 @@ const Header = (props) => {
         </Link>
         <div>
           <Link className="main-nav-item" to="/login">
-            <i className="fa fa-user-circle"></i>
+            <i className="fa fa-user-circle" ></i>
             Sign In
           </Link>
         </div>

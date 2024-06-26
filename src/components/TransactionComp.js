@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 
+
+// Définition des transactions fictives pour chaque compte.
 const transactions = {
   "8349": [
     {
@@ -49,28 +51,32 @@ const transactions = {
   ],
 };
 const TransactionComp = (props) => {
-  const { accountId } = useParams();
-  const [editTransaction, setEditTransaction] = useState(null);
-  const [category, setCategory] = useState("");
-  const [notes, setNotes] = useState("");
-  const [openTransaction, setOpenTransaction] = useState(null);
+  const { accountId } = useParams(); // Obtient l'ID du compte à partir des paramètres de l'URL.
+  const [editTransaction, setEditTransaction] = useState(null); // État pour la transaction en cours de modification.
+  const [category, setCategory] = useState(""); // État pour la catégorie de la transaction en cours de modification.
+  const [notes, setNotes] = useState(""); // État pour les notes de la transaction en cours de modification.
+  const [openTransaction, setOpenTransaction] = useState(null); // État pour la transaction actuellement ouverte.
 
+  // Fonction pour commencer la modification d'une transaction.
   const handleEdit = (transaction) => {
     setEditTransaction(transaction);
     setCategory(transaction.category);
     setNotes(transaction.notes);
   };
 
+  // Fonction pour sauvegarder les modifications d'une transaction.
   const handleSave = (transaction) => {
     transaction.category = category;
     transaction.notes = notes;
     setEditTransaction(null);
   };
 
+  // Fonction pour annuler la modification.
   const handleCancel = () => {
     setEditTransaction(null);
   };
 
+  // Fonction pour ouvrir/fermer les détails d'une transaction.
   const toggleTransaction = (index) => {
     setOpenTransaction(openTransaction === index ? null : index);
   };
@@ -79,7 +85,8 @@ const TransactionComp = (props) => {
     <div className="transaction-list">
       <div className="account-balance">
         <h1>Argent Bank Account (x{accountId})</h1>
-        <h2>{transactions[accountId][0].balance}</h2>
+        {/* Affiche le solde disponible. */}
+        <h2>{transactions[accountId][0].balance}</h2> 
         <p>Available Balance</p>
       </div>
       <div className="transaction-header">
@@ -88,24 +95,24 @@ const TransactionComp = (props) => {
         <span>AMOUNT</span>
         <span>BALANCE</span>
       </div>
-      {transactions[accountId].map((transaction, index) => (
+      {transactions[accountId].map((transaction, index) => (  // Boucle sur les transactions du compte.
         <div key={index} className="transaction">
           <div
             className="transaction-summary"
-            onClick={() => toggleTransaction(index)}
+            onClick={() => toggleTransaction(index)}  // Gestion du clic pour ouvrir/fermer les détails.
           >
-            {/* <span>{openTransaction === index ? "▼" : "▲"}</span> */}
+             {/* // Affiche un indicateur de l'état (ouvert/fermé). */}
             <span>
-              <p> {openTransaction === index ? "▼" : "▲"}</p>
+              <p> {openTransaction === index ? "▼" : "▲"}</p> 
               <p> {transaction.date}</p>
             </span>
             <span>{transaction.description}</span>
             <span>{transaction.amount}</span>
             <span>{transaction.balance}</span>
           </div>
-          {openTransaction === index && (
+          {openTransaction === index && (  // Affiche les détails de la transaction si elle est ouverte.
             <div className="transaction-details">
-              {editTransaction === transaction ? (
+              {editTransaction === transaction ? (  // Si la transaction est en mode édition.
                 <div className="transaction-edit">
                   <div>
                     <label>Category:</label>
@@ -130,7 +137,7 @@ const TransactionComp = (props) => {
                   <button onClick={() => handleSave(transaction)}>Save</button>
                   <button onClick={handleCancel}>Cancel</button>
                 </div>
-              ) : (
+              ) : (  // Si la transaction n'est pas en mode édition.
                 <div className="transaction-view">
                   <span>Category: {transaction.category}</span>
                   <span>Notes: {transaction.notes}</span>

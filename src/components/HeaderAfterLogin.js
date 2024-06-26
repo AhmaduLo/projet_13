@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { setUser, clearUser } from "../reducers/userReducer";
 
+
 const HeaderAfterLogin = () => {
   // Sélection de l'utilisateur et du token dans le store Redux
   const user = useSelector((state) => state.user.user);
@@ -43,7 +44,7 @@ const HeaderAfterLogin = () => {
 
   return (
     <nav className="main-nav">
-      <Link className="main-nav-logo" to="/">
+      <Link className="main-nav-logo" to="/profil">
         <img
           className="main-nav-logo-image"
           src="./img/argentBankLogo.png"
@@ -53,7 +54,7 @@ const HeaderAfterLogin = () => {
       </Link>
       <div>
         <>
-          <Link className="main-nav-item">
+          <Link className="main-nav-item" to="/profil">
             <i className="fa fa-user-circle"></i>
             {user ? `${user.firstName}` : "User"}!
           </Link>
