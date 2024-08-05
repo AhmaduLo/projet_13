@@ -1,17 +1,12 @@
-import React from 'react';
-import Footer from '../components/Footer';
-import Containerprofil from '../components/ContainerProfil';
-import HeaderAfterLogin from '../components/HeaderAfterLogin';
+import React from "react";
+import Containerprofil from "../components/ContainerProfil";
 
 const ProfilePage = (props) => {
-    return (
-        
-       <div className="profilPage">
-       <HeaderAfterLogin/>
-        <Containerprofil/>
-        <Footer/>
-       </div>
-    );
+  return (
+    <div className="profilPage">
+      <Containerprofil />
+    </div>
+  );
 };
 
 export default ProfilePage;

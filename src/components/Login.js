@@ -27,7 +27,6 @@ const Login = () => {
       );
       // Récupération du token de la réponse
       const { token } = response.data.body;
-
       // Dispatch de l'action pour sauvegarder le token dans le store Redux
       dispatch(setToken(token));
 
