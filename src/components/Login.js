@@ -8,6 +8,7 @@ const Login = () => {
   // Déclaration des états pour l'email et le mot de passe
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const dispatch = useDispatch(); // Initialisation du dispatch pour utiliser les actions Redux
   const navigate = useNavigate(); // Initialisation de navigate pour rediriger l'utilisateur
@@ -17,6 +18,8 @@ const Login = () => {
     event.preventDefault(); // Empêche le comportement par défaut du formulaire
 
     try {
+      // Réinitialise le message d'erreur à chaque soumission
+      setError("");
       // Envoi de la requête de connexion au backend
       const response = await axios.post(
         "http://localhost:3001/api/v1/user/login",
@@ -46,7 +49,18 @@ const Login = () => {
       navigate("/profil");
     } catch (error) {
       // Gestion des erreurs
-      console.error("Login error:", error);
+
+      if (error.response) {
+        if (error.response.status === 400) {
+          setError("Mot de passe ou email incorrect.");
+        } else if (error.response.status === 401) {
+          setError("Accès non autorisé. Veuillez vérifier vos identifiants.");
+        } else {
+          setError("Une erreur s'est produite. Veuillez réessayer.");
+        }
+      } else {
+        setError("Une erreur s'est produite. Veuillez réessayer.");
+      }
     }
   };
 
@@ -78,6 +92,7 @@ const Login = () => {
             <input type="checkbox" id="remember-me" />
             <label htmlFor="remember-me">Remember me</label>
           </div>
+          {error && <p style={{ color: "red" }}>{error}</p>}
           <button type="submit" className="sign-in-button">
             Sign In
           </button>

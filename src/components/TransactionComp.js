@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-
+import CryptoJS from "crypto-js";
 
 // Définition des transactions fictives pour chaque compte.
 const transactions = {
@@ -57,6 +57,27 @@ const TransactionComp = (props) => {
   const [notes, setNotes] = useState(""); // État pour les notes de la transaction en cours de modification.
   const [openTransaction, setOpenTransaction] = useState(null); // État pour la transaction actuellement ouverte.
 
+  // Clé secrète pour le chiffrement/déchiffrement
+  const secretKey = "your-secret-key"; // Remplacez par votre clé secrète
+
+  // Déchiffrement de l'ID de transaction
+  const decryptTransactionId = (encryptedId) => {
+    try {
+      const bytes = CryptoJS.AES.decrypt(encryptedId, secretKey);
+      return bytes.toString(CryptoJS.enc.Utf8);
+    } catch (error) {
+      console.error("Error decrypting transaction ID:", error);
+      return null;
+    }
+  };
+
+  // Déchiffrer l'ID de compte
+  const decryptedAccountId = decryptTransactionId(accountId);
+
+  if (!decryptedAccountId || !transactions[decryptedAccountId]) {
+    return <div>No transactions found for this account.</div>;
+  }
+
   // Fonction pour commencer la modification d'une transaction.
   const handleEdit = (transaction) => {
     setEditTransaction(transaction);
@@ -84,9 +105,9 @@ const TransactionComp = (props) => {
   return (
     <div className="transaction-list">
       <div className="account-balance">
-        <h1>Argent Bank Account (x{accountId})</h1>
+        <h1>Argent Bank Account (x{decryptedAccountId})</h1>
         {/* Affiche le solde disponible. */}
-        <h2>{transactions[accountId][0].balance}</h2> 
+        <h2>{transactions[decryptedAccountId][0].balance}</h2>
         <p>Available Balance</p>
       </div>
       <div className="transaction-header">
@@ -95,24 +116,27 @@ const TransactionComp = (props) => {
         <span>AMOUNT</span>
         <span>BALANCE</span>
       </div>
-      {transactions[accountId].map((transaction, index) => (  // Boucle sur les transactions du compte.
+      {transactions[decryptedAccountId].map((
+        transaction,
+        index // Boucle sur les transactions du compte.
+      ) => (
         <div key={index} className="transaction">
           <div
             className="transaction-summary"
-            onClick={() => toggleTransaction(index)}  // Gestion du clic pour ouvrir/fermer les détails.
+            onClick={() => toggleTransaction(index)} // Gestion du clic pour ouvrir/fermer les détails.
           >
-             {/* // Affiche un indicateur de l'état (ouvert/fermé). */}
+            {/* // Affiche un indicateur de l'état (ouvert/fermé). */}
             <span>
-              <p> {openTransaction === index ? "▼" : "▲"}</p> 
+              <p> {openTransaction === index ? "▼" : "▲"}</p>
               <p> {transaction.date}</p>
             </span>
             <span>{transaction.description}</span>
             <span>{transaction.amount}</span>
             <span>{transaction.balance}</span>
           </div>
-          {openTransaction === index && (  // Affiche les détails de la transaction si elle est ouverte.
+          {openTransaction === index && ( // Affiche les détails de la transaction si elle est ouverte.
             <div className="transaction-details">
-              {editTransaction === transaction ? (  // Si la transaction est en mode édition.
+              {editTransaction === transaction ? ( // Si la transaction est en mode édition.
                 <div className="transaction-edit">
                   <div>
                     <label>Category:</label>
@@ -137,7 +161,8 @@ const TransactionComp = (props) => {
                   <button onClick={() => handleSave(transaction)}>Save</button>
                   <button onClick={handleCancel}>Cancel</button>
                 </div>
-              ) : (  // Si la transaction n'est pas en mode édition.
+              ) : (
+                // Si la transaction n'est pas en mode édition.
                 <div className="transaction-view">
                   <span>Category: {transaction.category}</span>
                   <span>Notes: {transaction.notes}</span>

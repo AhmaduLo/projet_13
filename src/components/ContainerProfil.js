@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { setUser } from "../reducers/userReducer";
 import { useNavigate } from "react-router-dom";
+import CryptoJS from "crypto-js";
 
 const Container_profil = () => {
   // Sélection de l'utilisateur et du token dans le store Redux
@@ -68,6 +69,13 @@ const Container_profil = () => {
     setIsEditing(false);
   };
 
+  // Fonction pour crypter l'ID de transaction
+  const encryptTransactionId = (transactionId) => {
+    const secretKey = "your-secret-key"; // Remplacez par votre clé secrète
+    const encryptedId = CryptoJS.AES.encrypt(transactionId, secretKey).toString();
+    return encodeURIComponent(encryptedId); // Encodage de l'ID chiffré
+  };
+ 
   return (
     <main className="main bg-dark">
       <div className="header">
@@ -116,7 +124,9 @@ const Container_profil = () => {
         <div className="account-content-wrapper cta">
           <button
             className="transaction-button"
-            onClick={() => navigate("/transactions/8349")}
+            onClick={() =>
+              navigate(`/transactions/${encryptTransactionId("8349")}`)
+            }
           >
             View transactions
           </button>
@@ -131,7 +141,9 @@ const Container_profil = () => {
         <div className="account-content-wrapper cta">
           <button
             className="transaction-button"
-            onClick={() => navigate("/transactions/6712")}
+            onClick={() =>
+              navigate(`/transactions/${encryptTransactionId("6712")}`)
+            }
           >
             View transactions
           </button>
@@ -139,14 +151,16 @@ const Container_profil = () => {
       </section>
       <section className="account">
         <div className="account-content-wrapper">
-          <h3 className="account-title">Argent Bank Credit Card (x8349)</h3>
+          <h3 className="account-title">Argent Bank Credit Card (x5201)</h3>
           <p className="account-amount">$184.30</p>
           <p className="account-amount-description">Current Balance</p>
         </div>
         <div className="account-content-wrapper cta">
           <button
             className="transaction-button"
-            onClick={() => navigate("/transactions/8349")}
+            onClick={() =>
+              navigate(`/transactions/${encryptTransactionId("5201")}`)
+            }
           >
             View transactions
           </button>
